@@ -1,1 +1,147 @@
+Project Summary
+This project presents the design and documentation of a Layer 1 (Physical Layer) network infrastructure for a multi-building campus, with a particular focus on the forecourt building. Following an initial client meeting, a standard site layout, building locations, and functional requirements were agreed and documented using scaled drawings. Based on this information, a complete physical network design was developed.
+The project scope includes the planning of campus-wide containment, the placement of campus, building, and floor distributors, and the specification of all physical cabling systems. Structured cabling principles are applied throughout, using Cat6/Cat6a copper cabling for horizontal runs and multimode fiber for backbone connectivity. The forecourt building design accommodates a high user density, point-of-sale systems, wireless access points, printers, and CCTV, ensuring adequate capacity and future scalability.
+Two detailed marked-up drawings are produced as part of this project: a campus layout showing ducting and distributor locations, and a forecourt building layout illustrating cabinets, cableways, connection points, wireless access points, and security devices. In addition, a fully costed Bill of Materials (BOM) is provided, detailing all required Layer 1 components, labour costs, VAT, margins, and final customer pricing.
+Overall, this project demonstrates a structured and standards-based approach to physical network design, delivering a scalable, resilient, and cost-effective solution suitable for real-world deployment.
+
+Layer 1 Network Design Project
+Campus & Forecourt Building
+1. Introduction
+This project documents the design of the Physical Layer (Layer 1) network infrastructure for a multi-building campus, including a forecourt building with two floors.
+The objective of the project is to design, document, and cost the physical network components, including containment, cabling, cabinets, and connection points, based on a standardised site layout agreed with the client during the initial meeting.
+The design follows industry best practices and aligns with structured cabling standards to ensure scalability, resilience, and ease of maintenance.
+
+2. Project Scope
+The scope of this project includes:
+•	Campus-wide containment and distributor layout
+•	Building distributor (BD) and floor distributor (FD/IDF) locations
+•	Cable pathways and containment systems
+•	Physical cabling points for users, POS systems, printers, wireless access points, and CCTV
+•	Backbone cabling between floors
+•	A fully costed Bill of Materials (BOM) for all Layer 1 components
+The project excludes logical configuration (VLANs, IP addressing, routing, security rules), which are Layer 2/3 concerns.
+
+3. Standards and Assumptions
+•	Each grid block on the drawings represents 10 m × 10 m
+•	All horizontal cabling is Cat6 / Cat6a
+•	Backbone cabling uses multimode fiber (OM4)
+•	Cabinets are 19-inch standard racks
+•	Structured cabling follows a star topology
+•	Spare capacity is included for future expansion
+•	Carrier services enter the site via separate demarcation points
+
+4. Campus Network Design (Layer 1)
+Campus Distributor
+The Campus Distributor (CD) is in the Forecourt Building, within a dedicated communications area close to the vertical riser.
+This location was selected because it:
+•	Minimises backbone cable lengths
+•	Allows easy access to carrier services
+•	Provides centralised management of campus infrastructure
+ Campus Containment
+•	Green ducting is used for data/LAN services
+•	Grey ducting is reserved for carrier services
+•	Main data ducting specification:
+o	120 mm duct
+o	4 × subducts
+o	Draw rope installed
+•	Access pits/handholes are installed:
+o	At changes of direction
+o	At maximum cable pull distances
+This approach ensures separation of services, reduces interference, and allows future carrier or capacity expansion.
+
+ Forecourt Building – Physical Network Design
+The forecourt building consists of two floors:
+•	Ground Floor
+•	First Floor
+Each floor has its own Intermediate Distribution Frame (IDF).
+
+
+6. First Floor Network Design
+ User Density
+The first floor contains:
+•	10 workstation pods
+•	8 users per pod
+•	Total users: 80 people
+Each pod is provisioned with:
+•	8 Cat6 data ports
+•	Terminated at wall outlets
+•	Home-run cabling to the first-floor IDF
+First Floor Cabinet (IDF-1)
+The first-floor cabinet contains:
+•	Modem
+•	Firewall
+•	2 × Cat6 patch panels
+•	2 × repeaters
+•	5 × access switches
+•	Power distribution unit (PDU)
+•	UPS for power protection
+ Additional Devices
+•	1 network printer at the far end of the floor
+•	1 CCTV camera located in the left corner near the coffee area
+•	2 wireless access points to provide full floor coverage
+
+7. Ground Floor Network Design
+ POS and Office Areas
+The ground floor includes:
+•	4 POS terminals on the counter (1 computer per POS)
+•	Office:
+o	1 computer
+o	1 printer
+•	Store:
+o	1 computer
+o	1 printer
+o	1 POS terminal
+ Ground Floor Cabinet (IDF-2)
+The ground-floor cabinet contains:
+•	Modem
+•	2 × Cat6 patch panels
+•	1 × access switch
+•	UPS and PDU
+ Additional Equipment
+•	1 repeater on the POS counter segment
+•	2 wireless access points for public and staff areas
+
+8. Backbone Cabling
+•	A 12-core OM4 multimode fiber backbone connects IDF-1 and IDF-2
+•	Terminated using LC connectors
+•	Fiber patch panels installed in both cabinets
+•	Supports:
+o	1 Gbps and 10 Gbps uplinks
+o	Future expansion without recabling
+
+9. Layer 1 Responsibilities
+The physical layer is responsible for:
+•	Transmission of bits (0s and 1s)
+•	Voltage levels and signal timing
+•	Cable types, lengths, and pinouts
+•	Physical connectors and media
+•	Supported data rates (1 Gbps / 10 Gbps)
+This design ensures compliance with these responsibilities while maintaining flexibility and reliability.
+
+10. Bill of Materials (BOM)
+A full costed BOM is provided, including:
+•	Cabinets and racks
+•	Patch panels and patch cords
+•	Cat6/Cat6a copper cabling
+•	Fiber backbone cabling and termination
+•	Switches, repeaters, AP hardware, and CCTV
+•	Containment and consumables
+•	Labour (installer and consultant)
+Each BOM line includes:
+•	Net price
+•	VAT percentage and amount
+•	Gross price
+•	Quantity
+•	Margin and profit
+•	Final customer price
+
+11. Conclusion
+This project delivers a complete Layer 1 network design for the campus and forecourt building, meeting the client’s operational requirements while following structured cabling best practices.
+The design supports:
+•	High user density
+•	Secure and resilient connectivity
+•	Clear separation between carrier and internal networks
+•	Scalability for future growth
+All deliverables — drawings and BOM — provide a clear and professional foundation for installation and future network expansion.
+
 
