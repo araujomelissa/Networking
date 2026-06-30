@@ -1,0 +1,378 @@
+config system global
+ set hostname "FortiGate-HQ"
+end
+
+config system interface
+ edit "port1"
+  set alias "WAN-ISP"
+  set mode static
+  set ip 203.0.113.10 255.255.255.0
+  set allowaccess ping https ssh
+ next
+ edit "port2"
+  set alias "HQ-LAN"
+  set mode static
+  set ip 10.50.10.1 255.255.255.0
+  set allowaccess ping https ssh
+ next
+ edit "port4"
+  set alias "HQ-MGMT"
+  set mode static
+  set ip 10.50.99.1 255.255.255.0
+  set allowaccess ping https ssh
+ next
+end
+
+config router static
+ edit 1
+  set dst 0.0.0.0 0.0.0.0
+  set gateway 203.0.113.1
+  set device "port1"
+ next
+end
+
+config firewall address
+ edit "HQ-LAN"
+  set subnet 10.50.10.0 255.255.255.0
+ next
+ edit "HQ-MGMT"
+  set subnet 10.50.99.0 255.255.255.0
+ next
+ edit "HQ-JUMP-HOST"
+  set subnet 10.50.99.10 255.255.255.255
+ next
+ edit "SSLVPN-POOL"
+  set subnet 10.50.250.0 255.255.255.0
+ next
+ edit "DCE-LAN"
+  set subnet 10.50.20.0 255.255.255.0
+ next
+ edit "DCE-DMZ"
+  set subnet 10.50.120.0 255.255.255.0
+ next
+ edit "DCE-WEB"
+  set subnet 10.50.120.10 255.255.255.255
+ next
+ edit "DCW-LAN"
+  set subnet 10.50.30.0 255.255.255.0
+ next
+ edit "DCW-DMZ"
+  set subnet 10.50.130.0 255.255.255.0
+ next
+ edit "DCW-APP"
+  set subnet 10.50.130.10 255.255.255.255
+ next
+ edit "LOCAL-LAN"
+  set subnet 10.50.40.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase1-interface
+ edit "HQ-to-DCE"
+  set interface "port1"
+  set ike-version 2
+  set peertype any
+  set net-device disable
+  set proposal aes256-sha256
+  set dhgrp 14
+  set remote-gw 203.0.113.20
+  set psksecret "EP-A6-Strong-PSK-2026"
+ next
+end
+
+config vpn ipsec phase1-interface
+ edit "HQ-to-DCW"
+  set interface "port1"
+  set ike-version 2
+  set peertype any
+  set net-device disable
+  set proposal aes256-sha256
+  set dhgrp 14
+  set remote-gw 203.0.113.30
+  set psksecret "EP-A6-Strong-PSK-2026"
+ next
+end
+
+config vpn ipsec phase1-interface
+ edit "HQ-to-LOCAL"
+  set interface "port1"
+  set ike-version 2
+  set peertype any
+  set net-device disable
+  set proposal aes256-sha256
+  set dhgrp 14
+  set remote-gw 203.0.113.40
+  set psksecret "EP-A6-Strong-PSK-2026"
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-HQ-DCE-LAN"
+  set phase1name "HQ-to-DCE"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.10.0 255.255.255.0
+  set dst-subnet 10.50.20.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-HQ-DCE-DMZ"
+  set phase1name "HQ-to-DCE"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.99.0 255.255.255.0
+  set dst-subnet 10.50.120.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-HQ-DCW-LAN"
+  set phase1name "HQ-to-DCW"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.10.0 255.255.255.0
+  set dst-subnet 10.50.30.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-HQ-DCW-DMZ"
+  set phase1name "HQ-to-DCW"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.99.0 255.255.255.0
+  set dst-subnet 10.50.130.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-HQ-LOCAL"
+  set phase1name "HQ-to-LOCAL"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.10.0 255.255.255.0
+  set dst-subnet 10.50.40.0 255.255.255.0
+ next
+end
+
+config router static
+ edit 20
+  set dst 10.50.20.0 255.255.255.0
+  set device "HQ-to-DCE"
+ next
+end
+
+config router static
+ edit 21
+  set dst 10.50.120.0 255.255.255.0
+  set device "HQ-to-DCE"
+ next
+end
+
+config router static
+ edit 22
+  set dst 10.50.30.0 255.255.255.0
+  set device "HQ-to-DCW"
+ next
+end
+
+config router static
+ edit 23
+  set dst 10.50.130.0 255.255.255.0
+  set device "HQ-to-DCW"
+ next
+end
+
+config router static
+ edit 24
+  set dst 10.50.40.0 255.255.255.0
+  set device "HQ-to-LOCAL"
+ next
+end
+
+config firewall address
+ edit "SSLVPN_TUNNEL_POOL"
+  set type iprange
+  set start-ip 10.50.250.10
+  set end-ip 10.50.250.100
+ next
+end
+
+config user group
+ edit "Mobile-Staff"
+ next
+ edit "Maintenance-Contractors"
+ next
+end
+
+config vpn ssl web portal
+ edit "portal-mobile-staff"
+  set tunnel-mode enable
+  set split-tunneling enable
+  set ip-pools "SSLVPN_TUNNEL_POOL"
+ next
+ edit "portal-contractors"
+  set tunnel-mode enable
+  set split-tunneling enable
+  set ip-pools "SSLVPN_TUNNEL_POOL"
+ next
+end
+
+config vpn ssl settings
+ set servercert "Fortinet_Factory"
+ set source-interface "port1"
+ set source-address "all"
+ set port 10443
+ set default-portal "no-access"
+ config authentication-rule
+  edit 1
+   set groups "Mobile-Staff"
+   set portal "portal-mobile-staff"
+  next
+  edit 2
+   set groups "Maintenance-Contractors"
+   set portal "portal-contractors"
+  next
+ end
+end
+
+config firewall policy
+ edit 100
+  set name "HQ-LAN-to-Internet"
+  set srcintf "port2"
+  set dstintf "port1"
+  set srcaddr "HQ-LAN"
+  set dstaddr "all"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat enable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 101
+  set name "HQ-MGMT-to-Internet"
+  set srcintf "port4"
+  set dstintf "port1"
+  set srcaddr "HQ-MGMT"
+  set dstaddr "all"
+  set action accept
+  set schedule "always"
+  set service "DNS"
+  set nat enable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 110
+  set name "HQ-to-DCE-LAN"
+  set srcintf "port2"
+  set dstintf "HQ-to-DCE"
+  set srcaddr "HQ-LAN"
+  set dstaddr "DCE-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 111
+  set name "HQ-MGMT-to-DCE-DMZ"
+  set srcintf "port4"
+  set dstintf "HQ-to-DCE"
+  set srcaddr "HQ-MGMT"
+  set dstaddr "DCE-DMZ"
+  set action accept
+  set schedule "always"
+  set service "HTTPS"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 120
+  set name "HQ-to-DCW-LAN"
+  set srcintf "port2"
+  set dstintf "HQ-to-DCW"
+  set srcaddr "HQ-LAN"
+  set dstaddr "DCW-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 121
+  set name "HQ-MGMT-to-DCW-DMZ"
+  set srcintf "port4"
+  set dstintf "HQ-to-DCW"
+  set srcaddr "HQ-MGMT"
+  set dstaddr "DCW-DMZ"
+  set action accept
+  set schedule "always"
+  set service "HTTPS"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 130
+  set name "HQ-to-LOCAL-LAN"
+  set srcintf "port2"
+  set dstintf "HQ-to-LOCAL"
+  set srcaddr "HQ-LAN"
+  set dstaddr "LOCAL-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 140
+  set name "SSLVPN-Staff-to-HQ-LAN"
+  set srcintf "ssl.root"
+  set dstintf "port2"
+  set srcaddr "SSLVPN-POOL"
+  set dstaddr "HQ-LAN"
+  set action accept
+  set schedule "always"
+  set service "HTTPS"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 141
+  set name "SSLVPN-Contractors-to-JumpHost"
+  set srcintf "ssl.root"
+  set dstintf "port4"
+  set srcaddr "SSLVPN-POOL"
+  set dstaddr "HQ-JUMP-HOST"
+  set action accept
+  set schedule "always"
+  set service "RDP"
+  set nat disable
+  set logtraffic all
+ next
+end
