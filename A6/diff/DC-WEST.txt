@@ -1,0 +1,264 @@
+config system global
+ set hostname "FortiGate-DC-WEST"
+end
+
+config system interface
+ edit "port1"
+  set alias "WAN-ISP"
+  set mode static
+  set ip 203.0.113.30 255.255.255.0
+  set allowaccess ping https ssh
+ next
+ edit "port2"
+  set alias "DCW-LAN"
+  set mode static
+  set ip 10.50.30.1 255.255.255.0
+  set allowaccess ping https ssh
+ next
+ edit "port3"
+  set alias "DCW-DMZ"
+  set mode static
+  set ip 10.50.130.1 255.255.255.0
+  set allowaccess ping
+ next
+end
+
+config router static
+ edit 1
+  set dst 0.0.0.0 0.0.0.0
+  set gateway 203.0.113.1
+  set device "port1"
+ next
+end
+
+config firewall address
+ edit "HQ-LAN"
+  set subnet 10.50.10.0 255.255.255.0
+ next
+ edit "HQ-MGMT"
+  set subnet 10.50.99.0 255.255.255.0
+ next
+ edit "HQ-JUMP-HOST"
+  set subnet 10.50.99.10 255.255.255.255
+ next
+ edit "SSLVPN-POOL"
+  set subnet 10.50.250.0 255.255.255.0
+ next
+ edit "DCE-LAN"
+  set subnet 10.50.20.0 255.255.255.0
+ next
+ edit "DCE-DMZ"
+  set subnet 10.50.120.0 255.255.255.0
+ next
+ edit "DCE-WEB"
+  set subnet 10.50.120.10 255.255.255.255
+ next
+ edit "DCW-LAN"
+  set subnet 10.50.30.0 255.255.255.0
+ next
+ edit "DCW-DMZ"
+  set subnet 10.50.130.0 255.255.255.0
+ next
+ edit "DCW-APP"
+  set subnet 10.50.130.10 255.255.255.255
+ next
+ edit "LOCAL-LAN"
+  set subnet 10.50.40.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase1-interface
+ edit "DCW-to-HQ"
+  set interface "port1"
+  set ike-version 2
+  set peertype any
+  set net-device disable
+  set proposal aes256-sha256
+  set dhgrp 14
+  set remote-gw 203.0.113.10
+  set psksecret "EP-A6-Strong-PSK-2026"
+ next
+end
+
+config vpn ipsec phase1-interface
+ edit "DCW-to-DCE"
+  set interface "port1"
+  set ike-version 2
+  set peertype any
+  set net-device disable
+  set proposal aes256-sha256
+  set dhgrp 14
+  set remote-gw 203.0.113.20
+  set psksecret "EP-A6-Strong-PSK-2026"
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-DCW-LAN-HQ"
+  set phase1name "DCW-to-HQ"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.30.0 255.255.255.0
+  set dst-subnet 10.50.10.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-DCW-DMZ-HQ"
+  set phase1name "DCW-to-HQ"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.130.0 255.255.255.0
+  set dst-subnet 10.50.99.0 255.255.255.0
+ next
+end
+
+config vpn ipsec phase2-interface
+ edit "P2-DCW-DCE-DR"
+  set phase1name "DCW-to-DCE"
+  set proposal aes256-sha256
+  set pfs enable
+  set dhgrp 14
+  set src-subnet 10.50.30.0 255.255.255.0
+  set dst-subnet 10.50.20.0 255.255.255.0
+ next
+end
+
+config router static
+ edit 20
+  set dst 10.50.10.0 255.255.255.0
+  set device "DCW-to-HQ"
+ next
+end
+
+config router static
+ edit 21
+  set dst 10.50.99.0 255.255.255.0
+  set device "DCW-to-HQ"
+ next
+end
+
+config router static
+ edit 22
+  set dst 10.50.20.0 255.255.255.0
+  set device "DCW-to-DCE"
+ next
+end
+
+config firewall vip
+ edit "VIP-DCW-APP-HTTPS"
+  set extintf "port1"
+  set extip 203.0.113.30
+  set mappedip "10.50.130.10"
+  set portforward enable
+  set extport 443
+  set mappedport 443
+ next
+end
+
+config firewall policy
+ edit 100
+  set name "DCW-LAN-to-Internet"
+  set srcintf "port2"
+  set dstintf "port1"
+  set srcaddr "DCW-LAN"
+  set dstaddr "all"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat enable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 101
+  set name "DCW-DMZ-to-Internet-Limited"
+  set srcintf "port3"
+  set dstintf "port1"
+  set srcaddr "DCW-DMZ"
+  set dstaddr "all"
+  set action accept
+  set schedule "always"
+  set service "HTTPS"
+  set nat enable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 110
+  set name "Internet-to-DCW-App-HTTPS"
+  set srcintf "port1"
+  set dstintf "port3"
+  set srcaddr "all"
+  set dstaddr "VIP-DCW-APP-HTTPS"
+  set action accept
+  set schedule "always"
+  set service "HTTPS"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 120
+  set name "DCW-LAN-to-HQ"
+  set srcintf "port2"
+  set dstintf "DCW-to-HQ"
+  set srcaddr "DCW-LAN"
+  set dstaddr "HQ-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 121
+  set name "HQ-MGMT-to-DCW-DMZ"
+  set srcintf "DCW-to-HQ"
+  set dstintf "port3"
+  set srcaddr "HQ-MGMT"
+  set dstaddr "DCW-DMZ"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 130
+  set name "DCW-to-DCE-Replication"
+  set srcintf "port2"
+  set dstintf "DCW-to-DCE"
+  set srcaddr "DCW-LAN"
+  set dstaddr "DCE-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
+
+config firewall policy
+ edit 131
+  set name "DCE-to-DCW-Replication"
+  set srcintf "DCW-to-DCE"
+  set dstintf "port2"
+  set srcaddr "DCE-LAN"
+  set dstaddr "DCW-LAN"
+  set action accept
+  set schedule "always"
+  set service "ALL"
+  set nat disable
+  set logtraffic all
+ next
+end
